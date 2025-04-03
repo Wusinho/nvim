@@ -12,7 +12,6 @@ end
 
 vim.opt.rtp:prepend(lazypath)
 
---require("vim-options")
 vim.cmd("set expandtab")
 vim.cmd("set tabstop=2")
 vim.cmd("set shiftwidth=2")

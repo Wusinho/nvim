@@ -18,6 +18,7 @@ vim.cmd("set shiftwidth=2")
 
 vim.g.mapleader = " "
 vim.opt.swapfile = false
+vim.opt.hidden = true
 
 vim.keymap.set('n', '<c-k>', ':wincmd k<CR>')
 vim.keymap.set('n', '<c-j>', ':wincmd j<CR>')

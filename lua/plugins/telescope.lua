@@ -5,10 +5,13 @@ return {
     tag = '0.1.8',
     dependencies = {
       'nvim-lua/plenary.nvim',
-      { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' }, -- Add FZF
+      { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
+      { 'nvim-telescope/telescope-frecency.nvim', dependencies = { 'tami5/sqlite.lua' } },
     },
     config = function ()
-      require("telescope").setup({
+      local telescope = require("telescope")
+
+      telescope.setup({
         defaults = {
           file_ignore_patterns = { "node_modules", ".git" },
           sorting_strategy = "ascending",
@@ -21,30 +24,46 @@ return {
           find_files = {
             hidden = true,
             theme = "ivy",
-            find_command = { "rg", "--files", "--hidden", "--glob", "!.git/*" }, -- Uses ripgrep for better search
+            find_command = { "rg", "--files", "--hidden", "--glob", "!.git/*" },
           },
           live_grep = {
-            additional_args = function(_) return { "--unrestricted" } end, -- Ensure it searches all files
+            additional_args = function(_) return { "--unrestricted" } end,
           },
         },
         extensions = {
           fzf = {
-            fuzzy = true, -- Enable fuzzy searching
-            override_generic_sorter = true, -- Override default sorter
-            override_file_sorter = true, -- Override file sorter
-            case_mode = "smart_case", -- Case-insensitive unless uppercase is used
+            fuzzy = true,
+            override_generic_sorter = true,
+            override_file_sorter = true,
+            case_mode = "smart_case",
+          },
+          frecency = {
+            show_scores = true,
+            show_unindexed = false,
+            ignore_patterns = { "*.git/*", "*/tmp/*" },
+            workspaces = {},
+            db_safe_mode = false,
           },
         },
       })
 
-      -- Load FZF extension
-      require("telescope").load_extension("fzf")
+      telescope.load_extension("fzf")
+      telescope.load_extension("frecency")
 
       local builtin = require("telescope.builtin")
       vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = "Find files" })
       vim.keymap.set('n', '<leader>st', builtin.live_grep, { desc = "Search text" })
+      -- Only define project-specific frecency keymap
+
+
+vim.keymap.set('n', '<leader>sr', function()
+  require('telescope').extensions.frecency.frecency({
+    workspace = "CWD", -- properly scope to current project
+    path_display = { "shorten" },
+    theme = "ivy",
+  })
+end, { desc = "Recent files (project only)" })
+
     end
   }
 }
-
-

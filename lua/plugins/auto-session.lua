@@ -11,9 +11,9 @@ return {
     auto_session.setup({
       enabled = true,
       root_dir = vim.fn.stdpath("data") .. "/sessions/",
-      auto_save = true,    -- Auto-save on exit
-      auto_restore = true, -- Auto-restore on startup
-      auto_create = true,  -- Create session if not existing
+      auto_save = true,
+      auto_restore = true,
+      auto_create = true,
       suppressed_dirs = { "~", "~/Downloads", "/", "/tmp" },
       auto_restore_last_session = true,
       git_use_branch_name = true,
@@ -21,7 +21,6 @@ return {
       lazy_support = true,
       close_unsupported_windows = true,
       log_level = "error",
-
     })
   end,
 }

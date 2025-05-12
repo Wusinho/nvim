@@ -5,7 +5,7 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
     "clone",
     "--filter=blob:none",
     "https://github.com/folke/lazy.nvim.git",
-    "--branch=stable", -- latest stable release
+    "--branch=stable",
     lazypath,
   })
 end
@@ -26,13 +26,12 @@ vim.keymap.set('n', '<c-j>', ':wincmd j<CR>')
 vim.keymap.set('n', '<c-h>', ':wincmd h<CR>')
 vim.keymap.set('n', '<c-l>', ':wincmd l<CR>')
 vim.keymap.set("n", "<leader>w", ":w<CR>", { noremap = true, silent = true })
-vim.keymap.set("n", "<C-Left>",  ":vertical resize -2<CR>", { noremap = true, silent = true })
+vim.keymap.set("n", "<C-Left>", ":vertical resize -2<CR>", { noremap = true, silent = true })
 vim.keymap.set("n", "<C-Right>", ":vertical resize +2<CR>", { noremap = true, silent = true })
-vim.keymap.set("n", "<C-Up>",    ":resize +2<CR>", { noremap = true, silent = true })
-vim.keymap.set("n", "<C-Down>",  ":resize -2<CR>", { noremap = true, silent = true })
+vim.keymap.set("n", "<C-Up>", ":resize +2<CR>", { noremap = true, silent = true })
+vim.keymap.set("n", "<C-Down>", ":resize -2<CR>", { noremap = true, silent = true })
 
 vim.keymap.set('n', '<leader>h', ':nohlsearch<CR>')
 vim.wo.number = true
 
 require("lazy").setup("plugins")
-

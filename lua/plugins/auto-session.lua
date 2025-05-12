@@ -11,16 +11,18 @@ return {
     auto_session.setup({
       enabled = true,
       root_dir = vim.fn.stdpath("data") .. "/sessions/",
-      auto_save = true,
-      auto_restore = true,
-      auto_create = true,
-      suppressed_dirs = { "~", "~/Downloads", "/", "/tmp" },
-      auto_restore_last_session = true,
+      auto_save = true,                  -- ✅ Always save on quit
+      auto_restore = true,               -- ✅ Always try to restore on enter
+      auto_create = true,                -- ✅ Create session if none exists
+      auto_restore_last_session = false, -- ✅ Only restore matching cwd session
       git_use_branch_name = true,
       git_auto_restore_on_branch_change = false,
       lazy_support = true,
       close_unsupported_windows = true,
-      log_level = "error",
+      log_level = "debug",
     })
+
+    vim.keymap.set("n", "<leader>ar", "<cmd>SessionRestore<CR>", { desc = "Manual Restore Session" })
+    vim.keymap.set("n", "<leader>as", "<cmd>SessionSave<CR>", { desc = "Manual Save Session" })
   end,
 }

@@ -35,8 +35,9 @@ return {
 
     lspconfig.ruby_lsp.setup({
       on_attach = on_attach,
-      capabilities = capabilities,
-      cmd = { "/home/hlazo/.rbenv/shims/ruby-lsp" },
+      apabilities = capabilities,
+      -- cmd = { "/home/hlazo/.rbenv/shims/ruby-lsp" },
+      cmd = { "bundle", "exec", "ruby-lsp" },
       filetypes = { "ruby", "eruby" },
       settings = {
         rubyLsp = {

@@ -35,4 +35,9 @@ vim.keymap.set("n", "<C-Down>", ":resize -2<CR>", { noremap = true, silent = tru
 vim.keymap.set('n', '<leader>h', ':nohlsearch<CR>')
 vim.wo.number = true
 
-require("lazy").setup("plugins")
+require("lazy").setup({
+  spec = {
+    { import = "plugins" },      -- top-level specs
+    { import = "plugins.lsp" },  -- include all specs inside plugins/lsp/
+  },
+})

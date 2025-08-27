@@ -20,7 +20,7 @@ return {
         signcolumn = true,         -- Show symbols in the sign column
         numhl = true,              -- Highlight line numbers (your requested behavior)
         linehl = false,
-        word_diff = false,
+        word_diff = false, --- is this correct
 
         attach_to_untracked = true, -- Show signs for new files, too
         watch_gitdir = {

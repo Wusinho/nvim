@@ -4,7 +4,7 @@ return {
   config = function()
     local lspconfig = require("lspconfig")
     local util = require("lspconfig.util")
-    local shared = require("lsp.shared")  -- your helper with on_attach_common/capabilities
+    local shared = require("lsp.shared") -- your helper with on_attach_common/capabilities
 
     ---------------------------------------------------------------------------
     -- Ruby (ruby_lsp)  — EXACTLY as you provided
@@ -45,8 +45,8 @@ return {
       filetypes = { "ruby", "eruby" },
       root_dir = util.root_pattern("Gemfile", ".git"),
       init_options = {
-        formatter = "standard",
-        linters   = { "standard" },
+        formatter     = "standard",
+        linters       = { "standard" },
         addonSettings = {
           ["Ruby LSP Rails"] = { enablePendingMigrationsPrompt = true },
         },
@@ -57,7 +57,27 @@ return {
     -- Lua (lua_ls)
     ---------------------------------------------------------------------------
     lspconfig.lua_ls.setup({
-      on_attach = shared.on_attach_common,
+      on_attach = function(client, bufnr)
+        -- keep your shared behavior
+        shared.on_attach_common(client, bufnr)
+
+        -- ensure lua_ls can format
+        client.server_capabilities.documentFormattingProvider = true
+
+        -- format on save, filtered to lua_ls
+        local grp = vim.api.nvim_create_augroup("lua_ls_format_on_save_" .. bufnr, { clear = true })
+        vim.api.nvim_create_autocmd("BufWritePre", {
+          group = grp,
+          buffer = bufnr,
+          callback = function()
+            vim.lsp.buf.format({
+              bufnr = bufnr,
+              timeout_ms = 3000,
+              filter = function(c) return c.name == "lua_ls" end,
+            })
+          end,
+        })
+      end,
       capabilities = shared.capabilities,
       settings = {
         Lua = {
@@ -68,6 +88,7 @@ return {
             checkThirdParty = false,
           },
           telemetry = { enable = false },
+          format = { enable = true }, -- ← important
         },
       },
     })

@@ -5,9 +5,14 @@ return {
     local mason = require("mason")
     local mason_lspconfig = require("mason-lspconfig")
 
-    mason.setup()
-    mason_lspconfig.setup({
-      ensure_installed = { "lua_ls", "eslint", "ts_ls" },
+    mason.setup({
+      ui = {
+        icons = {
+          package_installed = "✓",
+          package_pending = "➜",
+          package_uninstalled = "✗"
+        }
+      }
     })
   end,
 }

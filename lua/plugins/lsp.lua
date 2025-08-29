@@ -100,24 +100,55 @@ return {
     lspconfig.ts_ls.setup({
       on_attach = function(client, bufnr)
         shared.on_attach_common(client, bufnr)
-        client.server_capabilities.documentFormattingProvider = false
-        client.server_capabilities.documentRangeFormattingProvider = false
+
+        -- allow ts_ls to format
+        client.server_capabilities.documentFormattingProvider = true
+        client.server_capabilities.documentRangeFormattingProvider = true
+
+        -- format on save, filtered to ts_ls
+        local grp = vim.api.nvim_create_augroup("ts_ls_format_on_save_" .. bufnr, { clear = true })
+        vim.api.nvim_create_autocmd("BufWritePre", {
+          group = grp,
+          buffer = bufnr,
+          callback = function()
+            vim.lsp.buf.format({
+              bufnr = bufnr,
+              timeout_ms = 3000,
+              filter = function(c) return c.name == "ts_ls" end,
+            })
+          end,
+        })
       end,
       capabilities = shared.capabilities,
+      settings = {
+        typescript = {
+          tsserver = { useSyntaxServer = "auto" },
+          format = { semicolons = "insert" },
+        },
+        javascript = {
+          format = { semicolons = "insert" },
+        },
+      },
     })
 
     lspconfig.eslint.setup({
       on_attach = function(client, bufnr)
         shared.on_attach_common(client, bufnr)
-        local grp = vim.api.nvim_create_augroup("eslint_fix_on_save", { clear = false })
-        vim.api.nvim_clear_autocmds({ group = grp, buffer = bufnr })
-        vim.api.nvim_create_autocmd("BufWritePre", {
+
+        -- keep ESLint for diagnostics/code actions; do not let it format
+        client.server_capabilities.documentFormattingProvider = false
+        client.server_capabilities.documentRangeFormattingProvider = false
+
+        -- run fixes AFTER the file is written/formatted by ts_ls
+        local grp = vim.api.nvim_create_augroup("eslint_fix_after_save_" .. bufnr, { clear = true })
+        vim.api.nvim_create_autocmd("BufWritePost", {
           group = grp,
           buffer = bufnr,
           command = "EslintFixAll",
         })
       end,
       capabilities = shared.capabilities,
+      settings = { workingDirectory = { mode = "auto" } },
     })
   end,
 }

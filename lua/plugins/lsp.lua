@@ -6,12 +6,10 @@ return {
     local util = require("lspconfig.util")
     local shared = require("lsp.shared") -- your helper with on_attach_common/capabilities
 
-    ---------------------------------------------------------------------------
-    -- Ruby (ruby_lsp)  — EXACTLY as you provided
-    ---------------------------------------------------------------------------
+    -- at the top of config(), after requiring util/shared:
     local function ruby_lsp_cmd(root_dir)
       root_dir = root_dir or vim.loop.cwd()
-      local has_gemfile = util.root_pattern("Gemfile")(root_dir)
+      local has_gemfile = require("lspconfig.util").root_pattern("Gemfile")(root_dir)
       if has_gemfile and vim.fn.executable("bundle") == 1 then
         return { "bundle", "exec", "ruby-lsp" }
       end
@@ -21,37 +19,44 @@ return {
       return { "ruby-lsp" } -- rbenv/asdf/system
     end
 
-    local function on_attach_ruby(client, bufnr)
-      shared.on_attach_common(client, bufnr)
-      -- Ruby-only format-on-save through ruby_lsp (StandardRB)
-      local grp = vim.api.nvim_create_augroup("ruby_lsp_format_on_save", { clear = false })
-      vim.api.nvim_clear_autocmds({ group = grp, buffer = bufnr })
-      vim.api.nvim_create_autocmd("BufWritePre", {
-        group = grp,
-        buffer = bufnr,
-        callback = function()
-          vim.lsp.buf.format({
-            bufnr = bufnr,
-            filter = function(c) return c.name == "ruby_lsp" end,
-          })
-        end,
-      })
-    end
-
+    -- Ruby LSP: RuboCop as formatter + linter, with format-on-save
     lspconfig.ruby_lsp.setup({
-      on_attach = on_attach_ruby,
+      on_attach = function(client, bufnr)
+        shared.on_attach_common(client, bufnr)
+
+        -- allow Ruby LSP to format (it calls RuboCop under the hood)
+        client.server_capabilities.documentFormattingProvider = true
+        client.server_capabilities.documentRangeFormattingProvider = true
+
+        -- (re)create a buffer-local format-on-save just for ruby_lsp
+        local grp = vim.api.nvim_create_augroup("ruby_lsp_format_on_save_" .. bufnr, { clear = true })
+        vim.api.nvim_create_autocmd("BufWritePre", {
+          group = grp,
+          buffer = bufnr,
+          callback = function()
+            vim.lsp.buf.format({
+              bufnr = bufnr,
+              async = false,
+              timeout_ms = 5000,
+              filter = function(c) return c.name == "ruby_lsp" end,
+            })
+          end,
+        })
+      end,
       capabilities = shared.capabilities,
       cmd = ruby_lsp_cmd(vim.loop.cwd()),
       filetypes = { "ruby", "eruby" },
       root_dir = util.root_pattern("Gemfile", ".git"),
       init_options = {
-        formatter     = "standard",
-        linters       = { "standard" },
+        formatter     = "rubocop",
+        linters       = { "rubocop" },
         addonSettings = {
           ["Ruby LSP Rails"] = { enablePendingMigrationsPrompt = true },
         },
       },
     })
+
+
 
     ---------------------------------------------------------------------------
     -- Lua (lua_ls)

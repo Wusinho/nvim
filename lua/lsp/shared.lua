@@ -1,7 +1,10 @@
 local M = {}
 
 M.capabilities = vim.lsp.protocol.make_client_capabilities()
-
+M.capabilities.textDocument.foldingRange = {
+  dynamicRegistration = false,
+  lineFoldingOnly = true, -- better performance for editors
+}
 function M.on_attach_common(client, bufnr)
   local bufopts = { noremap = true, silent = true, buffer = bufnr }
   vim.keymap.set('n', '<leader>cd', vim.lsp.buf.definition, bufopts)

@@ -1,0 +1,1 @@
+-- C# specific settings for Unity can be added here.

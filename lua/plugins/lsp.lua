@@ -155,5 +155,16 @@ return {
       capabilities = shared.capabilities,
       settings = { workingDirectory = { mode = "auto" } },
     })
+
+    ---------------------------------------------------------------------------
+    -- C# (omnisharp)
+    ---------------------------------------------------------------------------
+    lspconfig.omnisharp.setup({
+      on_attach = shared.on_attach_common,
+      capabilities = shared.capabilities,
+      cmd = { "omnisharp", "--languageserver", "--hostPID", tostring(vim.fn.getpid()) },
+      filetypes = { "cs" },
+      root_dir = util.root_pattern("*.sln", "*.csproj", ".git"),
+    })
   end,
 }
